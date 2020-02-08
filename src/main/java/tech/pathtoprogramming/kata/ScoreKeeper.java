@@ -6,7 +6,6 @@ import com.google.common.collect.Multiset;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.stream.Collectors;
 
 import static java.util.Arrays.sort;
 import static tech.pathtoprogramming.kata.ScoringCategory.LG_STRAIGHT;
@@ -29,9 +28,8 @@ public class ScoreKeeper {
             case SIXES:
                 return computeForNumbersCategory(diceRoll, 6);
             case THREE_OF_A_KIND:
-                return computeForThreeOfKind(diceRoll);
             case FOUR_OF_A_KIND:
-                return computeForThreeOfKind(diceRoll);
+                return computeForThreeOrFourOfAKind(diceRoll);
             case SM_STRAIGHT:
                 return computeStraight(diceRoll, SM_STRAIGHT);
             case LG_STRAIGHT:
@@ -50,6 +48,18 @@ public class ScoreKeeper {
         }
     }
 
+    public int[] getMostNumberOfOccurrences(List<BigDecimal> diceRoll) {
+        Multiset<BigDecimal> multiset = HashMultiset.create(diceRoll);
+        BigDecimal maxElement = BigDecimal.ZERO;
+        int maxCount = 0;
+        for (Multiset.Entry<BigDecimal> entry : multiset.entrySet()) {
+            if (entry.getCount() > maxCount) {
+                maxElement = entry.getElement();
+                maxCount = entry.getCount();
+            }
+        }
+        return new int[]{maxElement.intValue(), maxCount};
+    }
 
     private int computeStraight(int[] diceRoll, ScoringCategory category) {
         sort(diceRoll);
@@ -85,30 +95,10 @@ public class ScoreKeeper {
         return score.get();
     }
 
-    private int computeForThreeOfKind(int[] diceRoll) {
+    private int computeForThreeOrFourOfAKind(int[] diceRoll) {
         List<BigDecimal> bigDecimals = BasicUtils.toBigDecimalList(diceRoll);
         int[] mode = getMostNumberOfOccurrences(bigDecimals);
-        BigDecimal sum = new BigDecimal(0);
 
-        List<BigDecimal> filteredList = bigDecimals.stream().filter(bigDecimal -> mode[0] != bigDecimal.intValue()).collect(Collectors.toList());
-
-        if (!filteredList.isEmpty()) {
-            sum = filteredList.stream().reduce(BigDecimal::add).get();
-        }
-
-        return mode[0] * mode[1] + sum.intValue();
-    }
-
-    public int[] getMostNumberOfOccurrences(List<BigDecimal> diceRoll) {
-        Multiset<BigDecimal> multiset = HashMultiset.create(diceRoll);
-        BigDecimal maxElement = null;
-        int maxCount = 0;
-        for (Multiset.Entry<BigDecimal> entry : multiset.entrySet()) {
-            if (entry.getCount() > maxCount) {
-                maxElement = entry.getElement();
-                maxCount = entry.getCount();
-            }
-        }
-        return new int[]{maxElement.intValue(), maxCount};
+        return mode[0] * mode[1];
     }
 }

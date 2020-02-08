@@ -79,7 +79,7 @@ public class ScoreKeeperTest {
         ScoringCategory category = ScoringCategory.THREE_OF_A_KIND;
         int score = scoreKeeper.calculateScore(diceRoll, category);
 
-        assertThat(score).isEqualTo(23);
+        assertThat(score).isEqualTo(12);
     }
 
     @Test
@@ -97,7 +97,7 @@ public class ScoreKeeperTest {
         ScoringCategory category = ScoringCategory.FOUR_OF_A_KIND;
         int score = scoreKeeper.calculateScore(diceRoll, category);
 
-        assertThat(score).isEqualTo(17);
+        assertThat(score).isEqualTo(16);
     }
 
     @Test
