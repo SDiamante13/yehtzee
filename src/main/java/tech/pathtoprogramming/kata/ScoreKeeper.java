@@ -4,7 +4,10 @@ import com.google.common.collect.HashMultiset;
 import com.google.common.collect.Multiset;
 
 import java.math.BigDecimal;
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import static java.util.Arrays.sort;
@@ -14,6 +17,7 @@ import static tech.pathtoprogramming.kata.ScoringCategory.SM_STRAIGHT;
 public class ScoreKeeper {
 
     public int calculateScore(int[] diceRoll, ScoringCategory category) {
+        validateDiceRoll(diceRoll);
         switch (category) {
             case ONES:
                 return computeForNumbersCategory(diceRoll, 1);
@@ -34,18 +38,39 @@ public class ScoreKeeper {
                 return computeStraight(diceRoll, SM_STRAIGHT);
             case LG_STRAIGHT:
                 return computeStraight(diceRoll, LG_STRAIGHT);
-//            case FULL_HOUSE:
-//                 return 0;
-//                break;
-//            case YAHTZEE:
-//                 return 0;
-//                break;
-//            case CHANCE:
-//                 return 0;
-//                break;
+            case FULL_HOUSE:
+                return computeForFullHouse(diceRoll);
+            case YAHTZEE:
+                return computeForYahtzee(diceRoll);
+            case CHANCE:
+                 return computeForChance(diceRoll);
             default:
                 return 0;
         }
+    }
+
+    private int computeForChance(int[] diceRoll) {
+        return Arrays.stream(diceRoll).boxed().reduce(0, Integer::sum);
+    }
+
+    private void validateDiceRoll(int[] diceRoll) throws IllegalArgumentException {
+        for (int roll : diceRoll)
+            if (roll < 0 || roll > 6)
+                throw new IllegalArgumentException("Valid dice rolls must be between 1-6");
+    }
+
+    private int computeForYahtzee(int[] diceRoll) {
+        Set<Integer> yahtzee = new HashSet<>();
+        Arrays.stream(diceRoll).boxed().forEach(yahtzee::add);
+
+        return yahtzee.size() == 1 ? 50 : 0;
+    }
+
+    private int computeForFullHouse(int[] diceRoll) {
+        Set<Integer> fullHouse = new HashSet<>();
+        Arrays.stream(diceRoll).boxed().forEach(fullHouse::add);
+
+        return fullHouse.size() == 2 ? 25 : 0;
     }
 
     public int[] getMostNumberOfOccurrences(List<BigDecimal> diceRoll) {

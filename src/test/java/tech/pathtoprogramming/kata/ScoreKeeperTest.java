@@ -1,7 +1,10 @@
 package tech.pathtoprogramming.kata;
 
+import org.assertj.core.api.Assertions;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 
 import java.math.BigDecimal;
 import java.util.Arrays;
@@ -9,10 +12,14 @@ import java.util.List;
 
 import static java.math.BigDecimal.valueOf;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 public class ScoreKeeperTest {
 
     private ScoreKeeper scoreKeeper;
+
+    @Rule
+    public ExpectedException exceptionRule = ExpectedException.none();
 
     @Before
     public void setUp() throws Exception {
@@ -143,6 +150,74 @@ public class ScoreKeeperTest {
         int score = scoreKeeper.calculateScore(diceRoll, category);
 
         assertThat(score).isEqualTo(0);
+    }
+
+    @Test
+    public void calculateScore_returnsTheScoreForTheFullHouseCategory() {
+        int[] diceRoll = new int[]{1, 2, 2, 1, 2};
+        ScoringCategory category = ScoringCategory.FULL_HOUSE;
+        int score = scoreKeeper.calculateScore(diceRoll, category);
+
+        assertThat(score).isEqualTo(25);
+    }
+
+    @Test
+    public void calculateScore_returnsZeroForTheFullHouseCategory_whenThereIsNoFullHouse() {
+        int[] diceRoll = new int[]{1, 2, 3, 1, 2};
+        ScoringCategory category = ScoringCategory.FULL_HOUSE;
+        int score = scoreKeeper.calculateScore(diceRoll, category);
+
+        assertThat(score).isEqualTo(0);
+    }
+
+    @Test
+    public void calculateScore_returns50_whenYahyzeeIsRolled() {
+        int[] diceRoll = new int[]{2, 2, 2, 2, 2};
+        ScoringCategory category = ScoringCategory.YAHTZEE;
+        int score = scoreKeeper.calculateScore(diceRoll, category);
+
+        Assertions.assertThat(score).isEqualTo(50);
+    }
+
+    @Test
+    public void calculateScore_returns0_whenYahyzeeIsNotRolled() {
+        int[] diceRoll = new int[]{2, 6, 2, 3, 2};
+        ScoringCategory category = ScoringCategory.YAHTZEE;
+        int score = scoreKeeper.calculateScore(diceRoll, category);
+
+        Assertions.assertThat(score).isEqualTo(0);
+    }
+
+    @Test
+    public void calculateScore_returnsScore_whenCategoryIsChance() {
+        int[] diceRoll = new int[]{2, 6, 2, 4, 2};
+        ScoringCategory category = ScoringCategory.CHANCE;
+
+        int score = scoreKeeper.calculateScore(diceRoll, category);
+
+        Assertions.assertThat(score).isEqualTo(16);
+    }
+
+    @Test
+    public void calculateScore_shouldThrowException_whenDieIsGreaterThanSix() {
+        int[] diceRoll = new int[]{2, 6, 2, 7, 2};
+        ScoringCategory category = ScoringCategory.TWOS;
+
+        exceptionRule.expect(IllegalArgumentException.class);
+        exceptionRule.expectMessage("Valid dice rolls must be between 1-6");
+
+        scoreKeeper.calculateScore(diceRoll, category);
+    }
+
+    @Test
+    public void calculateScore_shouldThrowException_whenDieIsLessThanZerox() {
+        int[] diceRoll = new int[]{2, 6, 2, 4, -1};
+        ScoringCategory category = ScoringCategory.TWOS;
+
+        exceptionRule.expect(IllegalArgumentException.class);
+        exceptionRule.expectMessage("Valid dice rolls must be between 1-6");
+
+        scoreKeeper.calculateScore(diceRoll, category);
     }
 
     @Test
