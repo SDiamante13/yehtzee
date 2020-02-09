@@ -1,4 +1,4 @@
-package tech.pathtoprogramming.kata;
+package tech.pathtoprogramming.kata.utils;
 
 import java.math.BigDecimal;
 import java.util.Arrays;

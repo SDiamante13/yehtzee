@@ -1,7 +1,9 @@
-package tech.pathtoprogramming.kata;
+package tech.pathtoprogramming.kata.service;
 
 import com.google.common.collect.HashMultiset;
 import com.google.common.collect.Multiset;
+import tech.pathtoprogramming.kata.model.ScoringCategory;
+import tech.pathtoprogramming.kata.utils.BasicUtils;
 
 import java.math.BigDecimal;
 import java.util.Arrays;
@@ -11,10 +13,10 @@ import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import static java.util.Arrays.sort;
-import static tech.pathtoprogramming.kata.ScoringCategory.LG_STRAIGHT;
-import static tech.pathtoprogramming.kata.ScoringCategory.SM_STRAIGHT;
+import static tech.pathtoprogramming.kata.model.ScoringCategory.LG_STRAIGHT;
+import static tech.pathtoprogramming.kata.model.ScoringCategory.SM_STRAIGHT;
 
-public class ScoreKeeper {
+public class ScoreService {
 
     public int calculateScore(int[] diceRoll, ScoringCategory category) {
         validateDiceRoll(diceRoll);
@@ -53,7 +55,7 @@ public class ScoreKeeper {
         return Arrays.stream(diceRoll).boxed().reduce(0, Integer::sum);
     }
 
-    private void validateDiceRoll(int[] diceRoll) throws IllegalArgumentException {
+    private void validateDiceRoll(int[] diceRoll) {
         for (int roll : diceRoll)
             if (roll < 0 || roll > 6)
                 throw new IllegalArgumentException("Valid dice rolls must be between 1-6");
@@ -102,7 +104,7 @@ public class ScoreKeeper {
 
         while (j < diceRoll.length) {
             if (diceRoll[j] - diceRoll[i] == 1) sequenceCounter++;
-            else sequenceCounter = 1;
+            else sequenceCounter = sequenceCounter >= 4 ? sequenceCounter : 1;
             i++;
             j++;
         }
